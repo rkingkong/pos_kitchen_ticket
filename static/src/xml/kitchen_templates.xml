@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="tmpl" xml:space="preserve">
+    <!-- Inserta el botón en la PaymentScreen, antes del botón Validar -->
+    <t t-name="pos_kitchen.PaymentScreenKotButton"
+       t-inherit="point_of_sale.PaymentScreen"
+       t-inherit-mode="extension">
+        <xpath expr="//button[contains(@class,'button') and contains(@class,'next')]" position="before">
+            <button class="button oe_highlight"
+                    style="margin-right: 8px;"
+                    t-on-click="onClickPrintKitchen">
+                🧾 Imprimir comanda
+            </button>
+        </xpath>
+    </t>
+
+    <!-- Plantilla HTML imprimible de la comanda -->
+    <t t-name="pos_kitchen.KitchenTicket">
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>Comanda de cocina</title>
+            <style>
+                /* ancho tipo ticket 58/80mm */
+                @media print {
+                    @page { size: auto; margin: 4mm; }
+                    body { margin: 0; }
+                }
+                body { font-family: monospace; }
+                .ticket { width: 280px; margin: 0 auto; }
+                .title { text-align:center; font-size:18px; font-weight:700; margin-bottom:6px; }
+                .meta { font-size:12px; line-height:1.3; margin-bottom:8px; }
+                table.lines { width:100%; border-collapse:collapse; }
+                td.qty { width:20%; text-align:right; font-size:16px; font-weight:700; vertical-align:top; }
+                td.prod { width:80%; padding-left:8px; font-size:15px; font-weight:600; vertical-align:top; }
+                .note { font-size:12px; font-style:italic; padding-left:8px; }
+                .sep { border-top:1px dashed #000; margin:6px 0; }
+                .foot { text-align:center; font-size:11px; margin-top:8px; }
+            </style>
+        </head>
+        <body onload="setTimeout(function(){window.print();},100);">
+            <div class="ticket">
+                <div class="title">COMANDA DE COCINA</div>
+                <div class="meta">
+                    <t t-set="cashier" t-value="order.get_cashier()"/>
+                    <t t-set="client" t-value="order.get_client()"/>
+                    <t t-set="ref" t-value="order.get_name ? order.get_name() : order.uid"/>
+                    Ref: <t t-esc="ref"/>
+                    <t t-if="cashier"> • Usuario: <t t-esc="cashier.name"/></t>
+                    <br/>
+                    Fecha: <t t-esc="(new Date()).toLocaleString()"/>
+                    <t t-if="client"><br/>Cliente: <t t-esc="client.name"/></t>
+                    <t t-if="order.table"><br/>Mesa: <t t-esc="order.table.name"/></t>
+                </div>
+
+                <table class="lines">
+                    <tbody>
+                        <t t-foreach="order.get_orderlines()" t-as="line">
+                            <tr>
+                                <td class="qty">
+                                    <t t-esc="line.get_quantity_str ? line.get_quantity_str() : (''+line.get_quantity())"/>
+                                </td>
+                                <td class="prod">
+                                    <t t-esc="line.get_full_product_name ? line.get_full_product_name() : line.get_product().display_name"/>
+                                </td>
+                            </tr>
+                            <t t-if="line.get_note && line.get_note()">
+                                <tr><td></td><td class="note">Nota: <t t-esc="line.get_note()"/></td></tr>
+                            </t>
+                            <tr><td colspan="2"><div class="sep"></div></td></tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <t t-if="order.get_note && order.get_note()">
+                    <div class="note">Observación del pedido: <t t-esc="order.get_note()"/></div>
+                </t>
+                <div class="foot">— Fin —</div>
+            </div>
+        </body>
+        </html>
+    </t>
+</templates>
