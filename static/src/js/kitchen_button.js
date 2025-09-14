@@ -12,30 +12,34 @@ patch(PaymentScreen.prototype, {
         console.log("[pos_kitchen_ticket] PaymentScreen patch loaded ✅");
 
         const injectButton = () => {
-            // 1) Buscamos el contenedor de botones dentro de la PaymentScreen
-            const nextBtn = document.querySelector(".payment-buttons button.next, button.next");
-            const container =
-                document.querySelector(".payment-buttons") ||
-                (nextBtn ? nextBtn.parentElement : null);
+            // 1) Buscamos el botón "Validar" EXACTAMENTE como sale en tu HTML
+            const screen = document.querySelector(".payment-screen");
+            if (!screen) return;
 
-            // 2) Si tenemos contenedor y aún no existe nuestro botón, lo creamos
-            if (container && !container.querySelector(".kot-print")) {
-                const btn = document.createElement("button");
-                btn.className = "button oe_highlight kot-print";
-                btn.style.marginRight = "8px";
-                btn.textContent = "🧾 Imprimir comanda";
-                btn.addEventListener("click", this.onClickPrintKitchen.bind(this));
+            const mainContent = screen.querySelector(".main-content");
+            const nextBtn = mainContent && mainContent.querySelector(".button.next.validation");
+            if (!mainContent || !nextBtn) return;
 
-                if (nextBtn && nextBtn.parentElement === container) {
-                    container.insertBefore(btn, nextBtn); // antes de Validar
-                } else {
-                    container.appendChild(btn); // como fallback
-                }
+            // 2) Si aún no existe nuestro botón, lo insertamos ANTES de "Validar"
+            if (!mainContent.querySelector(".button.kot-print")) {
+                // Usamos un DIV para mantener el mismo look&feel que el "Validar"
+                const kot = document.createElement("div");
+                kot.className =
+                    "button kot-print btn btn-outline-secondary btn-lg py-5 rounded-0 " +
+                    "d-flex flex-column align-items-center justify-content-center fw-bolder";
+                kot.innerHTML =
+                    '<div class="pay-circle d-flex align-items-center justify-content-center mb-2">' +
+                    '<i class="fa fa-print" aria-hidden="true"></i>' +
+                    "</div><span>Imprimir comanda</span>";
+
+                kot.addEventListener("click", this.onClickPrintKitchen.bind(this));
+
+                mainContent.insertBefore(kot, nextBtn);
                 console.log("[pos_kitchen_ticket] Botón de comanda insertado ✔");
             }
         };
 
-        // Insertamos en montaje y cada vez que la pantalla se repinta
+        // Insertar al montar y cada vez que se re-renderiza la pantalla
         onMounted(injectButton);
         onPatched(injectButton);
     },
@@ -45,7 +49,12 @@ patch(PaymentScreen.prototype, {
             const order = this.pos.get_order();
             if (!order) return;
 
-            const html = this.env.qweb.render("pos_kitchen.KitchenTicket", { order, pos: this.pos });
+            // QWeb template definido en static/src/xml/kitchen_templates.xml (no tocar)
+            const html = this.env.qweb.render("pos_kitchen.KitchenTicket", {
+                order,
+                pos: this.pos,
+            });
+
             const w = window.open("", "KOT", "width=480,height=800,scrollbars=yes");
             w.document.open();
             w.document.write(html);
