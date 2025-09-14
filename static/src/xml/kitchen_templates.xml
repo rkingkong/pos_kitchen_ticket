@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="tmpl" xml:space="preserve">
-
-    <!-- Insertar el botón ANTES del botón “Validar” en la PaymentScreen.
-         Usamos un XPath robusto que funciona con Odoo 17. -->
-    <t t-name="pos_kitchen.PaymentScreenKotButton"
-       t-inherit="point_of_sale.PaymentScreen"
-       t-inherit-mode="extension">
-        <!-- Busca cualquier botón .next (“Validar”) dentro del contenedor de botones de pago -->
-        <xpath expr="//div[contains(@class,'payment-buttons')]//button[contains(@class,'next')]" position="before">
-            <button class="button oe_highlight kot-print"
-                    style="margin-right: 8px;"
-                    t-on-click="onClickPrintKitchen">
-                🧾 Imprimir comanda
-            </button>
-        </xpath>
-    </t>
-
-    <!-- Plantilla HTML que se imprime en el navegador -->
-    <t t-name="pos_kitchen.KitchenTicket">
+    <!-- Solo la plantilla imprimible (sin t-inherit) -->
+    <t t-name="pos_kitchen_ticket.KitchenTicket">
         <html>
         <head>
             <meta charset="utf-8"/>
@@ -32,7 +16,7 @@
                 td.qty  { width:20%; text-align:right; font-size:16px; font-weight:700; vertical-align:top; }
                 td.prod { width:80%; padding-left:8px; font-size:15px; font-weight:600; vertical-align:top; }
                 .note { font-size:12px; font-style:italic; padding-left:8px; }
-                .sep  { border-top:1px dashed #000; margin:6px 0; height:0px; }
+                .sep  { border-top:1px dashed #000; margin:6px 0; height:0; }
                 .foot { text-align:center; font-size:11px; margin-top:8px; }
             </style>
         </head>
@@ -43,8 +27,7 @@
                     <t t-set="cashier" t-value="order.get_cashier()"/>
                     <t t-set="client"  t-value="order.get_client()"/>
                     <t t-set="ref"     t-value="order.get_name ? order.get_name() : order.uid"/>
-                    Ref: <t t-esc="ref"/>
-                    <t t-if="cashier"> • Usuario: <t t-esc="cashier.name"/></t><br/>
+                    Ref: <t t-esc="ref"/><t t-if="cashier"> • Usuario: <t t-esc="cashier.name"/></t><br/>
                     Fecha: <t t-esc="(new Date()).toLocaleString()"/>
                     <t t-if="client"><br/>Cliente: <t t-esc="client.name"/></t>
                     <t t-if="order.table"><br/>Mesa: <t t-esc="order.table.name"/></t>
