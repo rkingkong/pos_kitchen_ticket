@@ -1,88 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Acción de reporte backend (PDF) -->
     <report
         id="action_report_pos_order_kitchen"
         model="pos.order"
         string="Comanda de cocina"
         report_type="qweb-pdf"
-        name="pos_kitchen.report_pos_order_kitchen"
+        name="pos_kitchen_ticket.report_pos_order_kitchen"
         print_report_name="'KOT - %s' % (object.name)"
         attachment_use="False"
     />
-
-    <!-- Plantilla QWeb del PDF -->
     <template id="report_pos_order_kitchen" name="Kitchen Ticket (POS)">
-        <t t-name="pos_kitchen.report_pos_order_kitchen">
+        <t t-name="pos_kitchen_ticket.report_pos_order_kitchen">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-set="company_currency" t-value="o.company_id.currency_id"/>
-                    <div class="article">
-                        <div class="page">
-                            <style>
-                                .kot-header { text-align:center; font-size: 20px; font-weight: 700; }
-                                .kot-meta { font-size: 12px; line-height: 1.2; margin: 6px 0 10px 0; }
-                                .kot-table { width:100%; border-collapse: collapse; }
-                                .kot-qty { width:18%; text-align:right; font-size:18px; font-weight:700; vertical-align:top; }
-                                .kot-prod { width:82%; font-size:16px; font-weight:600; padding-left:8px; vertical-align:top; }
-                                .kot-note { font-size:13px; font-style:italic; padding-left:8px; }
-                                .kot-sep  { border-top:1px dashed #000; margin:8px 0; height:0px; }
-                                .kot-cat  { font-size:13px; font-weight:700; margin:6px 0 2px 0; }
-                            </style>
+                    <div class="article"><div class="page">
+                        <style>
+                            .h{ text-align:center; font-size:20px; font-weight:700 }
+                            .m{ font-size:12px; line-height:1.2; margin:6px 0 10px }
+                            .t{ width:100%; border-collapse:collapse }
+                            .q{ width:18%; text-align:right; font-size:18px; font-weight:700; vertical-align:top }
+                            .p{ width:82%; font-size:16px; font-weight:600; padding-left:8px; vertical-align:top }
+                            .n{ font-size:13px; font-style:italic; padding-left:8px }
+                            .s{ border-top:1px dashed #000; margin:8px 0; height:0 }
+                        </style>
 
-                            <div class="kot-header">COMANDA DE COCINA</div>
-                            <div class="kot-meta">
-                                Pedido: <t t-esc="o.name"/> • Usuario: <t t-esc="o.user_id.name or ''"/><br/>
-                                Config: <t t-esc="o.config_id.name or ''"/> • Fecha: <t t-esc="o.date_order"/>
-                                <t t-if="o.partner_id">
-                                    <br/>Cliente: <t t-esc="o.partner_id.display_name or 'CF'"/>
-                                </t>
-                                <t t-if="o.table_id">
-                                    <br/>Mesa: <t t-esc="o.table_id.name"/>
-                                </t>
-                            </div>
-
-                            <t t-set="sorted_lines"
-                               t-value="sorted(o.lines, key=lambda l: ((l.product_id.pos_categ_id and l.product_id.pos_categ_id.name) or '', l.id))"/>
-                            <t t-set="last_cat" t-value="None"/>
-
-                            <table class="kot-table">
-                                <tbody>
-                                    <t t-foreach="sorted_lines" t-as="l">
-                                        <t t-set="cat_name" t-value="(l.product_id.pos_categ_id and l.product_id.pos_categ_id.name) or 'Sin categoría'"/>
-                                        <t t-if="cat_name != last_cat">
-                                            <tr><td colspan="2"><div class="kot-cat"><t t-esc="cat_name"/></div></td></tr>
-                                            <t t-set="last_cat" t-value="cat_name"/>
-                                        </t>
-
-                                        <tr t-if="not getattr(l, 'is_reward_line', False)">
-                                            <td class="kot-qty"><t t-esc="('{:g}'.format(l.qty))"/></td>
-                                            <td class="kot-prod">
-                                                <t t-esc="getattr(l, 'full_product_name', False) or l.product_id.display_name"/>
-                                            </td>
-                                        </tr>
-
-                                        <t t-foreach="l.pack_lot_ids" t-as="lot">
-                                            <tr><td></td><td class="kot-note">Lote/Serie: <t t-esc="lot.lot_name"/></td></tr>
-                                        </t>
-
-                                        <t t-if="getattr(l, 'customer_note', False)">
-                                            <tr><td></td><td class="kot-note">Nota: <t t-esc="l.customer_note"/></td></tr>
-                                        </t>
-                                        <t t-if="getattr(l, 'note', False) and not getattr(l, 'customer_note', False)">
-                                            <tr><td></td><td class="kot-note">Nota: <t t-esc="l.note"/></td></tr>
-                                        </t>
-
-                                        <tr><td colspan="2"><div class="kot-sep"></div></td></tr>
-                                    </t>
-                                </tbody>
-                            </table>
-
-                            <t t-if="getattr(o, 'note', False)">
-                                <div class="kot-note">Observación del pedido: <t t-esc="o.note"/></div>
-                            </t>
+                        <div class="h">COMANDA DE COCINA</div>
+                        <div class="m">
+                            Pedido: <t t-esc="o.name"/> • Usuario: <t t-esc="o.user_id.name or ''"/><br/>
+                            Config: <t t-esc="o.config_id.name or ''"/> • Fecha: <t t-esc="o.date_order"/>
+                            <t t-if="o.partner_id"><br/>Cliente: <t t-esc="o.partner_id.display_name or 'CF'"/></t>
+                            <t t-if="o.table_id"><br/>Mesa: <t t-esc="o.table_id.name"/></t>
                         </div>
-                    </div>
+
+                        <table class="t"><tbody>
+                            <t t-foreach="o.lines" t-as="l">
+                                <tr><td class="q"><t t-esc="('{:g}'.format(l.qty))"/></td>
+                                    <td class="p"><t t-esc="getattr(l, 'full_product_name', False) or l.product_id.display_name"/></td></tr>
+                                <t t-foreach="l.pack_lot_ids" t-as="lot">
+                                    <tr><td></td><td class="n">Lote/Serie: <t t-esc="lot.lot_name"/></td></tr>
+                                </t>
+                                <t t-if="getattr(l, 'customer_note', False)">
+                                    <tr><td></td><td class="n">Nota: <t t-esc="l.customer_note"/></td></tr>
+                                </t>
+                                <t t-if="getattr(l, 'note', False) and not getattr(l, 'customer_note', False)">
+                                    <tr><td></td><td class="n">Nota: <t t-esc="l.note"/></td></tr>
+                                </t>
+                                <tr><td colspan="2"><div class="s"></div></td></tr>
+                            </t>
+                        </tbody></table>
+
+                        <t t-if="getattr(o, 'note', False)">
+                            <div class="n">Observación del pedido: <t t-esc="o.note"/></div>
+                        </t>
+                    </div></div>
                 </t>
             </t>
         </t>
