@@ -4,7 +4,7 @@
     <t t-name="pos_kitchen.PaymentScreenKotButton"
        t-inherit="point_of_sale.PaymentScreen"
        t-inherit-mode="extension">
-        <xpath expr="//button[contains(@class,'button') and contains(@class,'next')]" position="before">
+        <xpath expr="//div[contains(@class,'footer')]//div[contains(@class,'buttons')]/button[contains(@class,'next')]" position="before">
             <button class="button oe_highlight"
                     style="margin-right: 8px;"
                     t-on-click="onClickPrintKitchen">
@@ -13,14 +13,13 @@
         </xpath>
     </t>
 
-    <!-- Plantilla HTML imprimible de la comanda -->
+    <!-- Plantilla imprimible en el navegador -->
     <t t-name="pos_kitchen.KitchenTicket">
         <html>
         <head>
             <meta charset="utf-8"/>
             <title>Comanda de cocina</title>
             <style>
-                /* ancho tipo ticket 58/80mm */
                 @media print {
                     @page { size: auto; margin: 4mm; }
                     body { margin: 0; }
@@ -33,7 +32,7 @@
                 td.qty { width:20%; text-align:right; font-size:16px; font-weight:700; vertical-align:top; }
                 td.prod { width:80%; padding-left:8px; font-size:15px; font-weight:600; vertical-align:top; }
                 .note { font-size:12px; font-style:italic; padding-left:8px; }
-                .sep { border-top:1px dashed #000; margin:6px 0; }
+                .sep { border-top:1px dashed #000; margin:6px 0; height:0px; }
                 .foot { text-align:center; font-size:11px; margin-top:8px; }
             </style>
         </head>
