@@ -6,14 +6,11 @@ import { usePos } from "@point_of_sale/app/store/pos_hook";
 import { onMounted, onPatched } from "@odoo/owl";
 
 function injectKotBeforeValidate(clickHandler) {
-    // Find the Validate block anywhere inside the payment screen
     const validate = document.querySelector(".payment-screen .button.next.validation");
     if (!validate) return false;
-
     const parent = validate.parentNode;
     if (!parent) return false;
 
-    // If our button is not there yet, create it
     if (!parent.querySelector(".button.kot-print")) {
         const kot = document.createElement("div");
         kot.className =
@@ -24,7 +21,6 @@ function injectKotBeforeValidate(clickHandler) {
             '<i class="fa fa-print" aria-hidden="true"></i>' +
             "</div><span>Imprimir comanda</span>";
         kot.addEventListener("click", clickHandler);
-
         parent.insertBefore(kot, validate);
         console.log("[pos_kitchen_ticket] Botón de comanda insertado ✔");
     }
@@ -38,8 +34,6 @@ patch(PaymentScreen.prototype, "pos_kitchen_ticket.PaymentScreenPatch", {
         console.log("[pos_kitchen_ticket] PaymentScreen patch loaded ✅");
 
         const tryInject = () => injectKotBeforeValidate(this.onClickPrintKitchen.bind(this));
-
-        // Try on mount, on re-render, and a couple of delayed retries
         onMounted(tryInject);
         onPatched(tryInject);
         setTimeout(tryInject, 200);
