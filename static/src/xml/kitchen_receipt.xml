@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_kitchen_ticket.KitchenReceipt">
+        <div class="pos-receipt kitchen-ticket">
+            <div class="receipt-header">
+                <h2 style="text-align: center;">COMANDA DE COCINA</h2>
+            </div>
+            
+            <div class="receipt-info">
+                <div>Orden: <t t-esc="order_name"/></div>
+                <div>Fecha: <t t-esc="date"/></div>
+                <t t-if="table">
+                    <div>Mesa: <t t-esc="table"/></div>
+                </t>
+                <div>Mesero: <t t-esc="cashier"/></div>
+                <t t-if="customer">
+                    <div>Cliente: <t t-esc="customer"/></div>
+                </t>
+            </div>
+            
+            <br/>
+            <div class="receipt-lines">
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%; text-align: right;">Cant</th>
+                            <th style="width: 85%; padding-left: 10px;">Producto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="lines" t-as="line" t-key="line_index">
+                            <tr>
+                                <td style="text-align: right; font-weight: bold; font-size: 16px;">
+                                    <t t-esc="line.quantity"/>
+                                </td>
+                                <td style="padding-left: 10px; font-size: 14px;">
+                                    <t t-esc="line.product_name"/>
+                                </td>
+                            </tr>
+                            <t t-if="line.note">
+                                <tr>
+                                    <td></td>
+                                    <td style="padding-left: 20px; font-style: italic; font-size: 12px;">
+                                        Nota: <t t-esc="line.note"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            
+            <t t-if="order_note">
+                <br/>
+                <div class="receipt-note">
+                    <strong>Observaciones:</strong> <t t-esc="order_note"/>
+                </div>
+            </t>
+            
+            <br/>
+            <div style="text-align: center;">
+                ================================<br/>
+                FIN DE COMANDA
+            </div>
+        </div>
+    </t>
+</templates>
