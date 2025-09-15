@@ -1,0 +1,36 @@
+.kitchen-print-button {
+    background-color: #ff6b35 !important;
+    color: white !important;
+    font-weight: bold;
+    margin: 5px;
+    padding: 12px 20px;
+    border-radius: 5px;
+}
+
+.kitchen-print-button:hover {
+    background-color: #e55a2b !important;
+}
+
+.kitchen-print-button i {
+    margin-right: 8px;
+}
+
+.kitchen-ticket {
+    font-family: 'Courier New', monospace;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.kitchen-ticket .receipt-header h2 {
+    margin: 10px 0;
+    font-size: 20px;
+}
+
+.kitchen-ticket .receipt-info {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.kitchen-ticket .receipt-lines {
+    margin-top: 10px;
+}
