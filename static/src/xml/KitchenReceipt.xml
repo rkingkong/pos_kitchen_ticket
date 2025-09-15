@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_kitchen_ticket.KitchenReceipt">
+        <receipt>
+            <div class="pos-receipt">
+                <div class="pos-receipt-center-align">
+                    <h2>COMANDA DE COCINA</h2>
+                    <br/>
+                </div>
+                
+                <div>
+                    Orden: <t t-esc="order.name"/><br/>
+                    Fecha: <t t-esc="order.date"/><br/>
+                    <t t-if="order.table">
+                        Mesa: <t t-esc="order.table"/><br/>
+                    </t>
+                    Mesero: <t t-esc="order.cashier"/><br/>
+                    Cliente: <t t-esc="order.customer"/><br/>
+                </div>
+                
+                <br/>
+                <div>=============================</div>
+                
+                <table class="receipt-orderlines">
+                    <t t-foreach="lines" t-as="line" t-key="line_index">
+                        <tr>
+                            <td style="width:20%; text-align:right; font-weight:bold;">
+                                <t t-esc="line.qty"/>
+                            </td>
+                            <td style="width:80%; padding-left:10px;">
+                                <t t-esc="line.product_name"/>
+                            </td>
+                        </tr>
+                        <t t-if="line.note">
+                            <tr>
+                                <td></td>
+                                <td style="padding-left:15px; font-style:italic;">
+                                    Nota: <t t-esc="line.note"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </t>
+                </table>
+                
+                <div>=============================</div>
+                
+                <t t-if="order.note">
+                    <br/>
+                    <div>
+                        <strong>Observaciones:</strong><br/>
+                        <t t-esc="order.note"/>
+                    </div>
+                </t>
+                
+                <br/>
+                <div class="pos-receipt-center-align">
+                    *** FIN DE COMANDA ***
+                </div>
+            </div>
+        </receipt>
+    </t>
+</templates>
