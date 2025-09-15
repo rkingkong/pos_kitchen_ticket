@@ -6,9 +6,8 @@
     'depends': ['point_of_sale'],
     'installable': True,
     'assets': {
-        'point_of_sale.assets': [
-            'pos_kitchen_ticket/static/src/js/PaymentScreenButton.js',
-            'pos_kitchen_ticket/static/src/xml/PaymentScreenButton.xml',
+        'point_of_sale._assets_pos': [
+            'pos_kitchen_ticket/static/src/**/*',
         ],
     },
 }
