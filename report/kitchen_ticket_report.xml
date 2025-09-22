@@ -33,7 +33,7 @@
                         <!-- Order Type -->
                         <div style="text-align: center; border: 2px solid #000; padding: 8px; margin: 10px 0;">
                             <h3 style="margin: 0; font-size: 16px;">
-                                <t t-esc="data['order_type']"/>
+                                <t t-esc="data.get('order_type', 'PARA COMER AQUÍ')"/>
                             </h3>
                         </div>
                         
