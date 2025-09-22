@@ -94,9 +94,9 @@ patch(PaymentScreen.prototype, {
 
         // Get order type (default if not set)
         let orderType = 'PARA COMER AQUÍ';
-        if (order.order_type === 'para_llevar') {
+        if (order.order_type_kitchen === 'para_llevar') {
             orderType = 'PARA LLEVAR';
-        } else if (order.order_type === 'domicilio') {
+        } else if (order.order_type_kitchen === 'domicilio') {
             orderType = 'A DOMICILIO';
         }
 
