@@ -24,7 +24,6 @@
     'website': 'https://kesiyos.com',
     'depends': [
         'point_of_sale',
-        'pos_restaurant',  # Para funcionalidades de restaurante si están disponibles
     ],
     'data': [
         # Security
