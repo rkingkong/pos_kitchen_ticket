@@ -1,0 +1,167 @@
+/* Estilos para botones de cocina */
+.kitchen-print-button {
+    background-color: #ff6b35 !important;
+    color: white !important;
+    font-weight: bold;
+    border: none;
+    padding: 15px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    min-width: 180px;
+}
+
+.kitchen-print-button:hover {
+    background-color: #e55a2b !important;
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.kitchen-print-button i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Botón de reimprimir recibo */
+.reprint-receipt-button {
+    background-color: #28a745 !important;
+    color: white !important;
+    font-weight: bold;
+    border: none;
+    padding: 15px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    min-width: 180px;
+}
+
+.reprint-receipt-button:hover {
+    background-color: #218838 !important;
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.reprint-receipt-button i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Indicador de tipo de orden */
+.order-type-indicator {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 100;
+}
+
+.order-type-indicator .badge {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Botón de tipo de orden en pantalla de productos */
+.order-type-button {
+    background-color: #6c757d !important;
+    color: white !important;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    min-width: 150px;
+}
+
+.order-type-button:hover {
+    background-color: #5a6268 !important;
+    transform: scale(1.02);
+}
+
+/* Botón de instrucciones especiales */
+.special-instructions-button {
+    background-color: #fd7e14 !important;
+    color: white !important;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.special-instructions-button:hover {
+    background-color: #e56b00 !important;
+    transform: scale(1.02);
+}
+
+/* Ajustes para pantalla de pago */
+.payment-screen .payment-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px;
+}
+
+/* Estado de impresión en cocina */
+.kitchen-printed-indicator {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+/* Animación de impresión */
+@keyframes printing {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.printing-animation {
+    animation: printing 1s ease-in-out infinite;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .kitchen-print-button,
+    .reprint-receipt-button {
+        min-width: 150px;
+        font-size: 14px;
+        padding: 12px 15px;
+    }
+    
+    .order-type-indicator {
+        top: 5px;
+        right: 10px;
+    }
+    
+    .order-type-indicator .badge {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
