@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Report Action -->
+        <report
+            id="action_report_pos_kitchen"
+            model="pos.order"
+            string="Comanda de Cocina"
+            report_type="qweb-pdf"
+            name="pos_kitchen_ticket.report_kitchen_ticket"
+            file="pos_kitchen_ticket.report_kitchen_ticket"
+            print_report_name="'Cocina - %s' % (object.name)"
+            paperformat="point_of_sale.paperformat_posreceipt"
+        />
+
+        <!-- Report Template -->
+        <template id="report_kitchen_ticket">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="data" t-value="o.get_kitchen_receipt_data()"/>
+                    <div class="page" style="font-family: monospace; width: 280px; margin: 0 auto;">
+                        
+                        <!-- Header -->
+                        <div style="text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px;">
+                            <h2 style="margin: 5px 0; font-size: 18px;">COMANDA DE COCINA</h2>
+                            <t t-if="data['reprint']">
+                                <div style="border: 1px solid #000; padding: 5px; margin: 5px 0;">
+                                    <strong>*** REIMPRESIÓN ***</strong>
+                                </div>
+                            </t>
+                        </div>
+                        
+                        <!-- Order Type -->
+                        <div style="text-align: center; border: 2px solid #000; padding: 8px; margin: 10px 0;">
+                            <h3 style="margin: 0; font-size: 16px;">
+                                <t t-esc="data['order_type']"/>
+                            </h3>
+                        </div>
+                        
+                        <!-- Order Info -->
+                        <div style="margin: 10px 0;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td>Orden:</td>
+                                    <td style="text-align: right;"><strong><t t-esc="data['order_name']"/></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Fecha:</td>
+                                    <td style="text-align: right;"><t t-esc="data['date_order']"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Cajero:</td>
+                                    <td style="text-align: right;"><t t-esc="data['cashier']"/></td>
+                                </tr>
+                                <t t-if="data['partner_name'] != 'Consumidor Final'">
+                                    <tr>
+                                        <td>Cliente:</td>
+                                        <td style="text-align: right;"><t t-esc="data['partner_name']"/></td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                        
+                        <!-- Line Items by Category -->
+                        <t t-foreach="data['lines_by_category']" t-as="category">
+                            <div style="border-top: 1px dashed #000; margin-top: 15px; padding-top: 10px;">
+                                <h4 style="margin: 5px 0; font-size: 14px; text-transform: uppercase; text-decoration: underline;">
+                                    <t t-esc="category[0]"/>
+                                </h4>
+                                <t t-foreach="category[1]" t-as="line">
+                                    <div style="margin: 8px 0; display: flex;">
+                                        <span style="min-width: 40px; font-weight: bold; font-size: 14px;">
+                                            <t t-esc="line['qty']"/>x
+                                        </span>
+                                        <span style="flex: 1;">
+                                            <t t-esc="line['product_name']"/>
+                                        </span>
+                                    </div>
+                                    <t t-if="line['note']">
+                                        <div style="margin-left: 40px; font-style: italic; font-size: 11px;">
+                                            Nota: <t t-esc="line['note']"/>
+                                        </div>
+                                    </t>
+                                </t>
+                            </div>
+                        </t>
+                        
+                        <!-- Special Instructions -->
+                        <t t-if="data['special_instructions']">
+                            <div style="border: 1px solid #000; padding: 10px; margin: 15px 0; background: #f0f0f0;">
+                                <strong>INSTRUCCIONES ESPECIALES:</strong><br/>
+                                <t t-esc="data['special_instructions']"/>
+                            </div>
+                        </t>
+                        
+                        <!-- Footer -->
+                        <div style="text-align: center; border-top: 2px dashed #000; padding-top: 10px; margin-top: 20px;">
+                            <h3 style="margin: 5px 0; font-size: 14px;">
+                                *** PREPARAR INMEDIATAMENTE ***
+                            </h3>
+                        </div>
+                        
+                        <!-- Print Info -->
+                        <div style="text-align: center; font-size: 10px; margin-top: 10px;">
+                            Impresión #<t t-esc="data['print_count']"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
