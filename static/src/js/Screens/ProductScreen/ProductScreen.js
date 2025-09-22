@@ -3,11 +3,16 @@
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { patch } from "@web/core/utils/patch";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
+import { TextAreaPopup } from "@point_of_sale/app/utils/input_popups/textarea_popup";
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
+import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 patch(ProductScreen.prototype, {
     setup() {
         super.setup(...arguments);
+        this.notification = useService("notification");
+        this.popup = useService("popup");
     },
 
     async onClickOrderType() {
@@ -25,13 +30,13 @@ patch(ProductScreen.prototype, {
         });
 
         if (confirmed) {
-            order.order_type = payload;
+            order.order_type_kitchen = payload;
             this.render(true);
             
-            // Notificar cambio
+            // Notify change
             this.notification.add(
                 _t(`Tipo de orden: ${selectionList.find(s => s.id === payload).label}`), 
-                { type: 'info', sticky: false, timeout: 2000 }
+                { type: 'info' }
             );
         }
     },
@@ -50,13 +55,13 @@ patch(ProductScreen.prototype, {
             
             this.notification.add(
                 _t('Instrucciones especiales agregadas'), 
-                { type: 'success', sticky: false, timeout: 2000 }
+                { type: 'success' }
             );
         }
     },
 
     async onClickQuickKitchenPrint() {
-        // Impresión rápida desde la pantalla de productos
+        // Quick print from product screen
         const order = this.pos.get_order();
         
         if (!order || order.get_orderlines().length === 0) {
@@ -68,8 +73,8 @@ patch(ProductScreen.prototype, {
         }
 
         try {
-            // Llamar a la función de impresión del PaymentScreen
-            const paymentScreen = this.pos.screens.payment;
+            // Call the print function from PaymentScreen
+            const paymentScreen = this.pos.screens?.payment;
             if (paymentScreen && paymentScreen.onClickPrintKitchen) {
                 await paymentScreen.onClickPrintKitchen.call({ 
                     ...paymentScreen, 
@@ -77,9 +82,18 @@ patch(ProductScreen.prototype, {
                     popup: this.popup,
                     notification: this.notification
                 });
+            } else {
+                // Direct print if payment screen not available
+                this.notification.add(_t("Función de impresión no disponible"), {
+                    type: 'warning'
+                });
             }
         } catch (error) {
             console.error("Error en impresión rápida:", error);
+            await this.popup.add(ErrorPopup, {
+                title: _t("Error"),
+                body: _t("No se pudo imprimir la comanda"),
+            });
         }
     }
 });
