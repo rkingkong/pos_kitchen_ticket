@@ -11,7 +11,7 @@ class PosSession(models.Model):
         result['search_params']['fields'].extend([
             'kitchen_printed', 
             'kitchen_print_count',
-            'order_type',
+            'order_type_kitchen',
             'special_instructions'
         ])
         return result
@@ -21,7 +21,6 @@ class PosSession(models.Model):
         result = super()._loader_params_pos_order_line()
         result['search_params']['fields'].extend([
             'kitchen_state',
-            'kitchen_notes',
-            'customer_note'
+            'kitchen_notes'
         ])
         return result
