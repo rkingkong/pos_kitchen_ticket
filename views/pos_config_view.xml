@@ -7,38 +7,39 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
             <field name="arch" type="xml">
-                <!-- Add after POS section - using same structure as pos_gt -->
+                <!-- Add after POS interface section -->
                 <xpath expr="//block[@id='pos_interface_section']" position="after">
                     <block title="Impresora de Cocina" id="pos_kitchen_printer">
                         <setting string="Habilitar Impresora de Cocina" help="Permite imprimir comandas de cocina directamente desde el POS">
                             <field name="pos_kitchen_printer_enabled"/>
                         </setting>
                         <setting string="Nombre de Impresora" 
-                                 attrs="{'invisible': [('pos_kitchen_printer_enabled', '=', False)]}"
+                                 invisible="pos_kitchen_printer_enabled == False"
                                  help="Nombre exacto de la impresora en Windows (ej: EPSON TM-88V)">
-                            <field name="pos_kitchen_printer_name"/>
+                            <field name="pos_kitchen_printer_name" 
+                                   required="pos_kitchen_printer_enabled == True"/>
                         </setting>
                         <setting string="Imprimir Automáticamente" 
-                                 attrs="{'invisible': [('pos_kitchen_printer_enabled', '=', False)]}"
+                                 invisible="pos_kitchen_printer_enabled == False"
                                  help="Imprimir comanda automáticamente al confirmar orden">
                             <field name="pos_auto_print_kitchen"/>
                         </setting>
                         <setting string="Permitir Impresión Antes del Pago" 
-                                 attrs="{'invisible': [('pos_kitchen_printer_enabled', '=', False)]}"
+                                 invisible="pos_kitchen_printer_enabled == False"
                                  help="Permitir imprimir comanda de cocina antes de procesar el pago">
                             <field name="pos_print_kitchen_before_payment"/>
                         </setting>
                         <setting string="Agrupar por Categoría" 
-                                 attrs="{'invisible': [('pos_kitchen_printer_enabled', '=', False)]}"
+                                 invisible="pos_kitchen_printer_enabled == False"
                                  help="Agrupar productos por categoría en la comanda">
                             <field name="pos_group_kitchen_items_by_category"/>
                         </setting>
                         <setting string="Encabezado de Comanda" 
-                                 attrs="{'invisible': [('pos_kitchen_printer_enabled', '=', False)]}">
+                                 invisible="pos_kitchen_printer_enabled == False">
                             <field name="pos_kitchen_receipt_header" placeholder="COMANDA DE COCINA"/>
                         </setting>
                         <setting string="Pie de Comanda" 
-                                 attrs="{'invisible': [('pos_kitchen_printer_enabled', '=', False)]}">
+                                 invisible="pos_kitchen_printer_enabled == False">
                             <field name="pos_kitchen_receipt_footer" placeholder="*** PREPARAR INMEDIATAMENTE ***"/>
                         </setting>
                     </block>
