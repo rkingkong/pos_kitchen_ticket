@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Agregar botones de cocina al Payment Screen -->
+    <t t-name="pos_kitchen_ticket.PaymentScreenButtons" t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('payment-buttons')]" position="inside">
+            <!-- Botón para imprimir comanda de cocina -->
+            <button class="button kitchen-print-button" 
+                    t-on-click="onClickPrintKitchen">
+                <i class="fa fa-cutlery" /> Enviar a Cocina
+            </button>
+            
+            <!-- Botón para reimprimir recibo -->
+            <button class="button reprint-receipt-button" 
+                    t-on-click="onClickReprintReceipt">
+                <i class="fa fa-print" /> Reimprimir Recibo
+            </button>
+        </xpath>
+    </t>
+
+    <!-- Indicador de orden tipo en la pantalla -->
+    <t t-name="pos_kitchen_ticket.OrderTypeIndicator" t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('top-content')]" position="inside">
+            <div class="order-type-indicator" t-if="pos.get_order()">
+                <t t-if="pos.get_order().order_type === 'para_llevar'">
+                    <span class="badge badge-warning">PARA LLEVAR</span>
+                </t>
+                <t t-elif="pos.get_order().order_type === 'domicilio'">
+                    <span class="badge badge-info">A DOMICILIO</span>
+                </t>
+                <t t-else="">
+                    <span class="badge badge-success">PARA COMER AQUÍ</span>
+                </t>
+            </div>
+        </xpath>
+    </t>
+
+</templates>
