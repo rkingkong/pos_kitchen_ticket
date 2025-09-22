@@ -7,44 +7,17 @@
             <field name="model">pos.config</field>
             <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@id='receipt']" position="after">
-                    <div class="col-12 col-lg-6 o_setting_box" id="kitchen_printer">
-                        <div class="o_setting_left_pane">
-                            <field name="kitchen_printer_enabled"/>
-                        </div>
-                        <div class="o_setting_right_pane">
-                            <label for="kitchen_printer_enabled"/>
-                            <div class="text-muted">
-                                Habilitar impresión de comandas de cocina
-                            </div>
-                            <div class="content-group" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}">
-                                <div class="row mt16">
-                                    <label for="kitchen_printer_name" class="col-lg-3 o_light_label"/>
-                                    <field name="kitchen_printer_name" placeholder="Ej: EPSON TM-88V"/>
-                                </div>
-                                <div class="row">
-                                    <label for="auto_print_kitchen" class="col-lg-3 o_light_label"/>
-                                    <field name="auto_print_kitchen"/>
-                                </div>
-                                <div class="row">
-                                    <label for="print_kitchen_before_payment" class="col-lg-3 o_light_label"/>
-                                    <field name="print_kitchen_before_payment"/>
-                                </div>
-                                <div class="row">
-                                    <label for="group_kitchen_items_by_category" class="col-lg-3 o_light_label"/>
-                                    <field name="group_kitchen_items_by_category"/>
-                                </div>
-                                <div class="row">
-                                    <label for="kitchen_receipt_header" class="col-lg-3 o_light_label"/>
-                                    <field name="kitchen_receipt_header" placeholder="COMANDA DE COCINA"/>
-                                </div>
-                                <div class="row">
-                                    <label for="kitchen_receipt_footer" class="col-lg-3 o_light_label"/>
-                                    <field name="kitchen_receipt_footer" placeholder="*** PREPARAR INMEDIATAMENTE ***"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Add kitchen printer settings after the Bills & Receipts section -->
+                <xpath expr="//group[@name='receipt_invoice']" position="after">
+                    <group string="Impresora de Cocina" name="kitchen_printer_group">
+                        <field name="kitchen_printer_enabled"/>
+                        <field name="kitchen_printer_name" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" placeholder="Ej: EPSON TM-88V"/>
+                        <field name="auto_print_kitchen" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
+                        <field name="print_kitchen_before_payment" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
+                        <field name="group_kitchen_items_by_category" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
+                        <field name="kitchen_receipt_header" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" placeholder="COMANDA DE COCINA"/>
+                        <field name="kitchen_receipt_footer" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" placeholder="*** PREPARAR INMEDIATAMENTE ***"/>
+                    </group>
                 </xpath>
             </field>
         </record>
