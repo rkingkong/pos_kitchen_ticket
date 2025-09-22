@@ -23,11 +23,21 @@ class PosOrder(models.Model):
         help='Fecha y hora de la última impresión de cocina'
     )
     
-    order_type = fields.Selection([
-        ('comer_aqui', 'Para Comer Aquí'),
-        ('para_llevar', 'Para Llevar'),
-        ('domicilio', 'A Domicilio')
-    ], string='Tipo de Orden', default='comer_aqui')
+    # Using selection_add to extend if field exists, or create new if not
+    order_type = fields.Selection(
+        selection_add=[
+            ('comer_aqui', 'Para Comer Aquí'),
+            ('para_llevar', 'Para Llevar'),
+            ('domicilio', 'A Domicilio')
+        ],
+        string='Tipo de Orden',
+        default='comer_aqui',
+        ondelete={
+            'comer_aqui': 'set default',
+            'para_llevar': 'set default',
+            'domicilio': 'set default'
+        }
+    )
     
     special_instructions = fields.Text(
         string='Instrucciones Especiales',
@@ -56,15 +66,30 @@ class PosOrder(models.Model):
         lines_by_category = {}
         
         for line in self.lines:
-            category_name = line.product_id.pos_categ_id.name if line.product_id.pos_categ_id else 'Sin Categoría'
+            # Get category name - handle both pos_categ_id and pos_categ_ids
+            category_name = 'Sin Categoría'
+            if hasattr(line.product_id, 'pos_categ_id') and line.product_id.pos_categ_id:
+                category_name = line.product_id.pos_categ_id.name
+            elif hasattr(line.product_id, 'pos_categ_ids') and line.product_id.pos_categ_ids:
+                category_name = line.product_id.pos_categ_ids[0].name if line.product_id.pos_categ_ids else 'Sin Categoría'
             
             if category_name not in lines_by_category:
                 lines_by_category[category_name] = []
             
+            # Get product name
+            product_name = line.full_product_name if hasattr(line, 'full_product_name') else line.product_id.display_name
+            
+            # Get customer note
+            note = ''
+            if hasattr(line, 'customer_note'):
+                note = line.customer_note or ''
+            elif hasattr(line, 'note'):
+                note = line.note or ''
+            
             lines_by_category[category_name].append({
                 'qty': int(line.qty),
-                'product_name': line.full_product_name or line.product_id.name,
-                'note': line.note or line.customer_note or '',
+                'product_name': product_name,
+                'note': note,
                 'price_unit': line.price_unit,
                 'price_subtotal': line.price_subtotal_incl,
             })
@@ -72,13 +97,18 @@ class PosOrder(models.Model):
         # Ordenar categorías alfabéticamente
         sorted_categories = sorted(lines_by_category.items())
         
+        # Format date
+        date_str = ''
+        if self.date_order:
+            date_str = fields.Datetime.context_timestamp(self, self.date_order).strftime('%d/%m/%Y %H:%M')
+        
         return {
             'order': self,
-            'order_name': self.name,
-            'order_type': dict(self._fields['order_type'].selection).get(self.order_type, ''),
-            'date_order': self.date_order.strftime('%d/%m/%Y %H:%M') if self.date_order else '',
+            'order_name': self.name or f"Orden-{self.id}",
+            'order_type': dict(self._fields['order_type'].selection).get(self.order_type, 'Para Comer Aquí'),
+            'date_order': date_str,
             'partner_name': self.partner_id.name if self.partner_id else 'Consumidor Final',
-            'cashier': self.user_id.name if self.user_id else '',
+            'cashier': self.user_id.name if self.user_id else 'Usuario',
             'total': self.amount_total,
             'special_instructions': self.special_instructions or '',
             'lines_by_category': sorted_categories,
