@@ -4,11 +4,14 @@ import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment
 import { patch } from "@web/core/utils/patch";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { ConfirmPopup } from "@point_of_sale/app/utils/confirm_popup/confirm_popup";
+import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 patch(PaymentScreen.prototype, {
     setup() {
         super.setup(...arguments);
+        this.notification = useService("notification");
+        this.popup = useService("popup");
         this.kitchenPrinted = false;
     },
 
@@ -24,8 +27,8 @@ patch(PaymentScreen.prototype, {
         }
 
         try {
-            // Verificar si es reimpresión
-            if (this.kitchenPrinted || order.kitchen_printed) {
+            // Check if this is a reprint
+            if (this.kitchenPrinted) {
                 const { confirmed } = await this.popup.add(ConfirmPopup, {
                     title: _t("Reimprimir Comanda"),
                     body: _t("Esta orden ya fue enviada a cocina. ¿Desea reimprimir?"),
@@ -34,22 +37,17 @@ patch(PaymentScreen.prototype, {
                 if (!confirmed) return;
             }
 
-            // Preparar datos de la comanda
+            // Prepare and print
             const receiptData = this.prepareKitchenReceiptData(order);
-            
-            // Imprimir usando el servicio de impresión
             await this.printKitchenReceipt(receiptData);
             
-            // Marcar como impreso
+            // Mark as printed
             this.kitchenPrinted = true;
-            order.kitchen_printed = true;
-            order.kitchen_print_count = (order.kitchen_print_count || 0) + 1;
             
-            // Mostrar confirmación
+            // Show success notification
             this.notification.add(_t("Comanda enviada a cocina"), {
                 type: 'success',
                 sticky: false,
-                timeout: 3000
             });
             
         } catch (error) {
@@ -65,60 +63,76 @@ patch(PaymentScreen.prototype, {
         const lines = order.get_orderlines();
         const groupedLines = {};
         
-        // Agrupar productos por categoría
+        // Group products by category
         lines.forEach(line => {
-            const category = line.product.pos_categ_id ? 
-                line.product.pos_categ_id[1] : 'Sin Categoría';
-            
-            if (!groupedLines[category]) {
-                groupedLines[category] = [];
+            // Get category name - handle different field structures
+            let categoryName = 'Sin Categoría';
+            if (line.product.pos_categ_id && line.product.pos_categ_id.length > 0) {
+                categoryName = line.product.pos_categ_id[1];
+            } else if (line.product.categ_id && line.product.categ_id.length > 0) {
+                categoryName = line.product.categ_id[1];
             }
             
-            groupedLines[category].push({
+            if (!groupedLines[categoryName]) {
+                groupedLines[categoryName] = [];
+            }
+            
+            groupedLines[categoryName].push({
                 qty: line.get_quantity(),
-                product: line.get_full_product_name(),
-                note: line.get_customer_note() || '',
+                product: line.get_display_name(),
+                note: line.get_note ? line.get_note() : '',
                 price: line.get_display_price(),
             });
         });
 
-        // Ordenar categorías
+        // Sort categories
         const sortedCategories = Object.keys(groupedLines).sort();
         const categoriesWithLines = sortedCategories.map(cat => ({
             name: cat,
             lines: groupedLines[cat]
         }));
 
+        // Get order type (default if not set)
+        let orderType = 'PARA COMER AQUÍ';
+        if (order.order_type === 'para_llevar') {
+            orderType = 'PARA LLEVAR';
+        } else if (order.order_type === 'domicilio') {
+            orderType = 'A DOMICILIO';
+        }
+
         return {
             order: order,
-            orderName: order.name || `Orden ${order.sequence_number || ''}`,
-            orderType: order.order_type === 'para_llevar' ? 'PARA LLEVAR' : 
-                      order.order_type === 'domicilio' ? 'A DOMICILIO' : 'PARA COMER AQUÍ',
+            orderName: order.name || `Orden ${order.uid || ''}`,
+            orderType: orderType,
             date: new Date().toLocaleString('es-GT'),
             cashier: this.pos.user.name,
             customer: order.get_partner() ? order.get_partner().name : 'Consumidor Final',
             total: this.env.utils.formatCurrency(order.get_total_with_tax()),
             categories: categoriesWithLines,
             specialInstructions: order.special_instructions || '',
-            reprint: this.kitchenPrinted || order.kitchen_printed
+            reprint: this.kitchenPrinted
         };
     },
 
     async printKitchenReceipt(receiptData) {
-        // Crear el HTML para la impresión
+        // Create HTML for printing
         const printContent = this.renderKitchenReceipt(receiptData);
         
-        // Crear ventana de impresión
+        // Create print window
         const printWindow = window.open('', 'PRINT', 'height=600,width=350');
+        
+        if (!printWindow) {
+            throw new Error("No se pudo abrir la ventana de impresión");
+        }
         
         printWindow.document.write(printContent);
         printWindow.document.close();
         printWindow.focus();
         
-        // Imprimir automáticamente
+        // Auto print after a short delay
         setTimeout(() => {
             printWindow.print();
-            printWindow.close();
+            setTimeout(() => printWindow.close(), 100);
         }, 250);
     },
 
@@ -281,7 +295,7 @@ patch(PaymentScreen.prototype, {
     },
 
     async onClickReprintReceipt() {
-        // Función para reimprimir recibo FEL
+        // Function to reprint FEL receipt
         const order = this.pos.get_order();
         
         if (!order) {
@@ -293,13 +307,17 @@ patch(PaymentScreen.prototype, {
         }
 
         try {
-            // Reimprimir recibo normal
-            await this.printReceipt();
+            // Call standard receipt print
+            if (this.printer && this.printer.print_receipt) {
+                await this.printer.print_receipt(order);
+            } else {
+                // Fallback to window print
+                window.print();
+            }
             
             this.notification.add(_t("Recibo reimpreso"), {
                 type: 'success',
                 sticky: false,
-                timeout: 2000
             });
         } catch (error) {
             console.error("Error al reimprimir:", error);
