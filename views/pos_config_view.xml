@@ -7,17 +7,32 @@
             <field name="model">pos.config</field>
             <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
             <field name="arch" type="xml">
-                <!-- Add kitchen printer settings after the Bills & Receipts section -->
-                <xpath expr="//group[@name='receipt_invoice']" position="after">
-                    <group string="Impresora de Cocina" name="kitchen_printer_group">
-                        <field name="kitchen_printer_enabled"/>
-                        <field name="kitchen_printer_name" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" placeholder="Ej: EPSON TM-88V"/>
-                        <field name="auto_print_kitchen" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
-                        <field name="print_kitchen_before_payment" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
-                        <field name="group_kitchen_items_by_category" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
-                        <field name="kitchen_receipt_header" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" placeholder="COMANDA DE COCINA"/>
-                        <field name="kitchen_receipt_footer" attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" placeholder="*** PREPARAR INMEDIATAMENTE ***"/>
-                    </group>
+                <!-- Add a new page in the notebook for Kitchen Settings -->
+                <xpath expr="//form/sheet/notebook" position="inside">
+                    <page string="Impresora de Cocina" name="kitchen_printer">
+                        <group>
+                            <group string="Configuración de Impresora de Cocina">
+                                <field name="kitchen_printer_enabled"/>
+                                <field name="kitchen_printer_name" 
+                                       attrs="{'invisible': [('kitchen_printer_enabled', '=', False)], 'required': [('kitchen_printer_enabled', '=', True)]}" 
+                                       placeholder="Ej: EPSON TM-88V"/>
+                                <field name="auto_print_kitchen" 
+                                       attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
+                                <field name="print_kitchen_before_payment" 
+                                       attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
+                            </group>
+                            <group string="Formato de Comanda">
+                                <field name="group_kitchen_items_by_category" 
+                                       attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}"/>
+                                <field name="kitchen_receipt_header" 
+                                       attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" 
+                                       placeholder="COMANDA DE COCINA"/>
+                                <field name="kitchen_receipt_footer" 
+                                       attrs="{'invisible': [('kitchen_printer_enabled', '=', False)]}" 
+                                       placeholder="*** PREPARAR INMEDIATAMENTE ***"/>
+                            </group>
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
