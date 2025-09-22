@@ -47,3 +47,43 @@ class PosConfig(models.Model):
         default='*** PREPARAR INMEDIATAMENTE ***',
         help='Texto del pie de la comanda'
     )
+
+
+class ResConfigSettings(models.TransientModel):
+    _inherit = 'res.config.settings'
+    
+    # Link fields to pos.config - following same pattern as pos_gt
+    pos_kitchen_printer_enabled = fields.Boolean(
+        related='pos_config_id.kitchen_printer_enabled', 
+        readonly=False
+    )
+    
+    pos_kitchen_printer_name = fields.Char(
+        related='pos_config_id.kitchen_printer_name', 
+        readonly=False
+    )
+    
+    pos_auto_print_kitchen = fields.Boolean(
+        related='pos_config_id.auto_print_kitchen', 
+        readonly=False
+    )
+    
+    pos_print_kitchen_before_payment = fields.Boolean(
+        related='pos_config_id.print_kitchen_before_payment', 
+        readonly=False
+    )
+    
+    pos_group_kitchen_items_by_category = fields.Boolean(
+        related='pos_config_id.group_kitchen_items_by_category', 
+        readonly=False
+    )
+    
+    pos_kitchen_receipt_header = fields.Text(
+        related='pos_config_id.kitchen_receipt_header', 
+        readonly=False
+    )
+    
+    pos_kitchen_receipt_footer = fields.Text(
+        related='pos_config_id.kitchen_receipt_footer', 
+        readonly=False
+    )
